@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datos de Usuario</title>
+</head>
+<body>
+    <h1>Datos del Usuario</h1>
+
+    <p>Nombre: {{ data.name }}</p>
+    <p>Edad: {{ data.age }}</p>
+    <p>Ciudad: {{ data.city }}</p>
+
+    <h2>Datos en Lista</h2>
+    <ul>
+        <li>Nombre: {{ data.name }}</li>
+        <li>Edad: {{ data.age }}</li>
+        <li>Ciudad: {{ data.city }}</li>
+    </ul>
+
+    <h2>Datos en Tabla</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Campo</th>
+                <th>Valor</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Nombre</td>
+                <td>{{ data.name }}</td>
+            </tr>
+            <tr>
+                <td>Edad</td>
+                <td>{{ data.age }}</td>
+            </tr>
+            <tr>
+                <td>Ciudad</td>
+                <td>{{ data.city }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>

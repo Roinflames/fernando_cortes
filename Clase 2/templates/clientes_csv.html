@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar Cliente</title>
+</head>
+<body>
+    <h1>Buscar Cliente</h1>
+
+    <form method="POST">
+        <label for="cliente_nombre">Nombre del Cliente:</label>
+        <input type="text" name="cliente_nombre" id="cliente_nombre">
+        <button type="submit">Buscar</button>
+    </form>
+
+    {% if data %}
+        <h2>Datos del Cliente:</h2>
+        <p>Nombre: {{ data.nombre }}</p>
+        <p>Edad: {{ data.edad }}</p>
+        <p>Ciudad: {{ data.ciudad }}</p>
+    {% elif error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+</body>
+</html>

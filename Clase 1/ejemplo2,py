@@ -1,0 +1,5 @@
+precio = float(input("Ingrese el precio del producto: "))
+descuento = float(input("Ingrese el descuento en %: "))
+precio_final = precio - (precio * descuento / 100)
+print(f"Total a pagar: ${precio_final}")
+#TODO todos los tipos de parseo

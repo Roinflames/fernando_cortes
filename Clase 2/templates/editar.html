@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Cliente</title>
+</head>
+<body>
+    <h1>Editar Cliente</h1>
+
+    <form method="POST">
+        <label for="nombre">Nombre:</label>
+        <input type="text" name="nombre" id="nombre" value="{{ cliente.nombre }}">
+        <br>
+        <label for="edad">Edad:</label>
+        <input type="number" name="edad" id="edad" value="{{ cliente.edad }}">
+        <br>
+        <label for="ciudad">Ciudad:</label>
+        <input type="text" name="ciudad" id="ciudad" value="{{ cliente.ciudad }}">
+        <br>
+        <button type="submit">Guardar Cambios</button>
+    </form>
+</body>
+</html>
