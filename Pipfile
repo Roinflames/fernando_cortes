@@ -7,6 +7,9 @@ name = "pypi"
 flask = "*"
 mysql-connector-python = "*"
 pandas = "*"
+matplotlib = "*"
+seaborn = "*"
+mysql = "*"
 
 [dev-packages]
 
