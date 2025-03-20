@@ -35,6 +35,11 @@ def query_to_dataframe(query):
     conn.close()
     return df
 
+# Nueva ruta para redirigir desde la raíz a /clientes
+@app.route('/')
+def root():
+    return redirect(url_for('get_clientes'))
+
 # Rutas CRUD (igual que antes)
 # Ruta para obtener todos los clientes (READ/LIST)
 @app.route('/clientes', methods=['GET'])
