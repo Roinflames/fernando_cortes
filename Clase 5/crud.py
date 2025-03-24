@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, render_template, redirect, url_for
+from flask import Flask, jsonify, request, render_template, redirect, url_for, flash
 import mysql.connector
 import pandas as pd
 from io import BytesIO
@@ -44,7 +44,17 @@ def root():
 # Ruta para obtener todos los clientes (READ/LIST)
 @app.route('/clientes', methods=['GET'])
 def get_clientes():
+    print("get_clientes")
     conn = get_db_connection()
+    print("esta es", conn)
+    print(conn is None)
+    if conn is None:
+        try:
+            return render_template('error_db.html', message="No se pudo conectar a la base de datos. Por favor, verifica el servicio MySQL."), 500
+        except Exception as e:
+            print(f"Error al renderizar error_db.html: {e}")
+            return "Ocurrió un error al mostrar la página de error.", 500
+        
     if conn:
         cursor = conn.cursor(dictionary=True)
         cursor.execute("SELECT * FROM clientes")
@@ -98,6 +108,7 @@ def create_cliente():
             cursor.close()
             conn.close()
             # return "Cliente creado exitosamente", 201 # TODO mejorar la redireccion
+            flash('Cliente creado exitosamente', 'success')  # Agrega un mensaje flash
             return redirect(url_for('get_clientes')) # Redirige a la lista de clientes
         
         except mysql.connector.IntegrityError:
@@ -140,6 +151,7 @@ def update_cliente(cliente_id):
             cursor.close()
             conn.close()
             # return "Cliente actualizado exitosamente" #TODO redireccionar
+            flash('Cliente actualizado exitosamente', 'success')
             return redirect(url_for('get_clientes')) # Redirige a la lista de clientes
 
         except mysql.connector.IntegrityError:
@@ -158,31 +170,42 @@ def delete_cliente(cliente_id):
         cursor.close()
         conn.close()
         # return "Cliente eliminado exitosamente" #TODO redireccionar
+        flash('Cliente eliminado exitosamente', 'success')
         return redirect(url_for('get_clientes')) # Redirige a la lista de clientes
     
     else:
         return "No se pudo conectar a la base de datos", 500
 
+@app.route('/metricas')
+def metricas_index():
+    return render_template('metricas_index.html')
 
 # Ruta para mostrar métricas y gráficos
-@app.route('/metricas')
-def metricas():
-    # Ejemplo de métrica: Número de clientes
+@app.route('/metricas/pedidos_por_cliente')
+def pedidos_por_cliente():
+    # Ejemplo de métrica: Número de Pedidos por Cliente
+    # iloc es un indexador basado en enteros en Pandas, que se utiliza para seleccionar filas y columnas por su posición.
     num_clientes = query_to_dataframe("SELECT COUNT(*) as num_clientes FROM clientes").iloc[0]['num_clientes']
 
     # Ejemplo de gráfico: Número de pedidos por cliente
     df_pedidos = query_to_dataframe("SELECT cliente_id, COUNT(*) as num_pedidos FROM pedidos GROUP BY cliente_id")
+    # plt.figure crea una nueva figura de matplotlib con un tamaño de 8x6 pulgadas.
     plt.figure(figsize=(8, 6))
+    # sns.barplot es una función de Seaborn que se utiliza para crear gráficos de barras.
     sns.barplot(x='cliente_id', y='num_pedidos', data=df_pedidos)
     plt.title('Número de Pedidos por Cliente')
     plt.xlabel('ID del Cliente')
     plt.ylabel('Número de Pedidos')
+    # img = BytesIO() se utiliza para crear un búfer en memoria donde se guardará la imagen generada por matplotlib. 
     img = BytesIO()
+    # plt.savefig guarda la imagen en el búfer img en formato PNG.
     plt.savefig(img, format='png')
+    # img.seek(0) se utiliza para mover el cursor al inicio del búfer.
     img.seek(0)
+    # base64.b64encode(img.getvalue()) se utiliza para convertir la imagen en un string codificado en base64.
     plot_url = base64.b64encode(img.getvalue()).decode('utf8')
-
-    return render_template('metricas.html', num_clientes=num_clientes, plot_url=plot_url)
+    # render_template renderiza la plantilla pedidos_por_cliente.html y pasa las variables num_clientes y plot_url a la plantilla.
+    return render_template('pedidos_por_cliente.html', num_clientes=num_clientes, plot_url=plot_url)
 
 if __name__ == '__main__':
     app.run(debug=True)
