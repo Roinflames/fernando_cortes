@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pedidos</title>
+</head>
+<body>
+    <h1>Pedidos</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Cliente</th>
+                <th>Fecha</th>
+                <th>Monto</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pedido in pedidos %}
+            <tr>
+                <td>{{ pedido.pedido_id }}</td>
+                <td>{{ pedido.cliente_id }}</td>
+                <td>{{ pedido.fecha_pedido }}</td>
+                <td>{{ pedido.monto }}</td>
+                <td><a href="/pedidos/{{ pedido.pedido_id }}">Ver detalle</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="/metricas">Volver</a>
+</body>
+</html>

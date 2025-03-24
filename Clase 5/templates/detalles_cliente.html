@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Detalles del Cliente</title>
+</head>
+<body>
+    <h1>Detalles del Cliente</h1>
+    <p><strong>ID:</strong> {{ cliente.cliente_id }}</p>
+    <p><strong>Nombre:</strong> {{ cliente.nombre }}</p>
+    <p><strong>Apellido:</strong> {{ cliente.apellido }}</p>
+    <p><strong>Email:</strong> {{ cliente.email }}</p>
+    <p><strong>Teléfono:</strong> {{ cliente.telefono }}</p>
+    <p><strong>Dirección:</strong> {{ cliente.direccion }}</p>
+    <a href="/clientes/editar/{{ cliente.cliente_id }}">Editar</a>
+    <a href="/clientes/eliminar/{{ cliente.cliente_id }}">Eliminar</a>
+</body>
+</html>

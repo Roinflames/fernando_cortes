@@ -6,7 +6,7 @@ import base64
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='./styles')
 
 # Configuración de la conexión MySQL (igual que antes)
 app.config['MYSQL_HOST'] = 'localhost'
@@ -180,6 +180,12 @@ def delete_cliente(cliente_id):
 def metricas_index():
     return render_template('metricas_index.html')
 
+# Obtener todos los pedidos
+@app.route('/pedidos')
+def get_pedidos():
+    pedidos = query_to_dataframe("SELECT * FROM pedidos").to_dict(orient='records')
+    return render_template('pedidos.html', pedidos=pedidos)
+
 # Ruta para mostrar métricas y gráficos
 @app.route('/metricas/pedidos_por_cliente')
 def pedidos_por_cliente():
@@ -206,6 +212,12 @@ def pedidos_por_cliente():
     plot_url = base64.b64encode(img.getvalue()).decode('utf8')
     # render_template renderiza la plantilla pedidos_por_cliente.html y pasa las variables num_clientes y plot_url a la plantilla.
     return render_template('pedidos_por_cliente.html', num_clientes=num_clientes, plot_url=plot_url)
+
+@app.route('/metricas/monto_total_pedidos')
+def monto_total_pedidos():
+    # Calcular el monto total de pedidos
+    monto_total = query_to_dataframe("SELECT SUM(monto) as monto_total FROM pedidos").iloc[0]['monto_total']
+    return render_template('monto_total_pedidos.html', monto_total=monto_total)
 
 if __name__ == '__main__':
     app.run(debug=True)
