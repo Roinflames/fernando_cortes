@@ -2,16 +2,43 @@
 <html>
 <head>
     <title>Detalles del Cliente</title>
+    <link rel="stylesheet" href="../styles/estilos_generales.css">
+    <link rel="stylesheet" href="../styles/estilos_detalles_cliente.css">
 </head>
 <body>
     <h1>Detalles del Cliente</h1>
-    <p><strong>ID:</strong> {{ cliente.cliente_id }}</p>
-    <p><strong>Nombre:</strong> {{ cliente.nombre }}</p>
-    <p><strong>Apellido:</strong> {{ cliente.apellido }}</p>
-    <p><strong>Email:</strong> {{ cliente.email }}</p>
-    <p><strong>Teléfono:</strong> {{ cliente.telefono }}</p>
-    <p><strong>Dirección:</strong> {{ cliente.direccion }}</p>
-    <a href="/clientes/editar/{{ cliente.cliente_id }}">Editar</a>
-    <a href="/clientes/eliminar/{{ cliente.cliente_id }}">Eliminar</a>
+
+    <table>
+        <tr>
+            <th>ID</th>
+            <td>{{ cliente.cliente_id }}</td>
+        </tr>
+        <tr>
+            <th>Nombre</th>
+            <td>{{ cliente.nombre }}</td>
+        </tr>
+        <tr>
+            <th>Apellido</th>
+            <td>{{ cliente.apellido }}</td>
+        </tr>
+        <tr>
+            <th>Email</th>
+            <td>{{ cliente.email }}</td>
+        </tr>
+        <tr>
+            <th>Teléfono</th>
+            <td>{{ cliente.telefono }}</td>
+        </tr>
+        <tr>
+            <th>Dirección</th>
+            <td>{{ cliente.direccion }}</td>
+        </tr>
+    </table>
+
+    <div class="acciones">
+        <button onclick="location.href='/clientes/editar/{{ cliente.cliente_id }}'">Editar</button>
+        <button onclick="location.href='/clientes/eliminar/{{ cliente.cliente_id }}'">Eliminar</button>
+        <button onclick="location.href='/clientes'">Volver</button>
+    </div>
 </body>
 </html>

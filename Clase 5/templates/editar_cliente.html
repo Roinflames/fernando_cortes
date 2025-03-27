@@ -2,6 +2,8 @@
 <html>
 <head>
     <title>Editar Cliente</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='estilos_generales.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='estilos_editar_cliente.css') }}">
 </head>
 <body>
     <h1>Editar Cliente</h1>
@@ -17,6 +19,7 @@
         <label for="direccion">Dirección:</label><br>
         <input type="text" id="direccion" name="direccion" value="{{ cliente.direccion }}"><br>
         <input type="submit" value="Actualizar">
+        <button onclick="location.href='/clientes'">Volver</button>
     </form>
 </body>
 </html>

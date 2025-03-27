@@ -5,8 +5,14 @@ from io import BytesIO
 import base64
 import matplotlib.pyplot as plt
 import seaborn as sns
+import secrets
+import os
+
+# secret_key = secrets.token_hex(16)  # Genera una clave hexadecimal de 32 caracteres (16 bytes)
+# print(secret_key)
 
 app = Flask(__name__, static_folder='./styles')
+app.secret_key = '3a32beead02aa957a788a2cbd5fe31c1'  # Reemplaza con tu clave generada
 
 # Configuración de la conexión MySQL (igual que antes)
 app.config['MYSQL_HOST'] = 'localhost'
@@ -44,27 +50,24 @@ def root():
 # Ruta para obtener todos los clientes (READ/LIST)
 @app.route('/clientes', methods=['GET'])
 def get_clientes():
-    print("get_clientes")
     conn = get_db_connection()
-    print("esta es", conn)
-    print(conn is None)
-    if conn is None:
-        try:
-            return render_template('error_db.html', message="No se pudo conectar a la base de datos. Por favor, verifica el servicio MySQL."), 500
-        except Exception as e:
-            print(f"Error al renderizar error_db.html: {e}")
-            return "Ocurrió un error al mostrar la página de error.", 500
-        
-    if conn:
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM clientes")
-        clientes = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        return render_template('lista_clientes.html', clientes=clientes)
-    else:
-        return "No se pudo conectar a la base de datos", 500
-
+    try:
+        if conn is None:
+            try:
+                return render_template('error_db.html', message="No se pudo conectar a la base de datos. Por favor, verifica el servicio MySQL."), 500
+            except Exception as e:
+                print(f"Error al renderizar error_db.html: {e}")
+                return "Ocurrió un error al mostrar la página de error.", 500
+        else:
+            cursor = conn.cursor(dictionary=True)
+            cursor.execute("SELECT * FROM clientes")
+            clientes = cursor.fetchall()
+            cursor.close()
+            conn.close()
+            return render_template('lista_clientes.html', clientes=clientes)
+    except Exception as e:
+        print(f"Ocurrió un error inesperado: {e}")
+        return "Ocurrió un error inesperado.", 500
 # Ruta para obtener un cliente por ID (READ/DETAILS)
 @app.route('/clientes/<int:cliente_id>', methods=['GET'])
 def get_cliente(cliente_id):
@@ -160,22 +163,51 @@ def update_cliente(cliente_id):
         return "No se pudo conectar a la base de datos", 500
 
 # Ruta para eliminar un cliente (DELETE)
+from flask import flash, redirect, url_for
+import mysql.connector
+
 @app.route('/clientes/eliminar/<int:cliente_id>', methods=['GET'])
 def delete_cliente(cliente_id):
+    # Ya no se agrega el mensaje de depuración aquí
     conn = get_db_connection()
     if conn:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM clientes WHERE cliente_id = %s", (cliente_id,))
-        conn.commit()
-        cursor.close()
-        conn.close()
-        # return "Cliente eliminado exitosamente" #TODO redireccionar
-        flash('Cliente eliminado exitosamente', 'success')
-        return redirect(url_for('get_clientes')) # Redirige a la lista de clientes
-    
-    else:
-        return "No se pudo conectar a la base de datos", 500
+        try:
+            # Iniciar transacción
+            conn.start_transaction()
 
+            # Intentar eliminar el cliente
+            cursor.execute("DELETE FROM clientes WHERE cliente_id = %s", (cliente_id,))
+            conn.commit()  # Confirmar la eliminación
+
+            flash('Cliente eliminado exitosamente', 'success')
+
+        except mysql.connector.errors.IntegrityError:
+            conn.rollback()  # Revertir la transacción si falla
+            # Opción 1: Mostrar mensaje de error al usuario
+            flash('No se puede eliminar el cliente porque tiene pedidos asociados.', 'error')
+
+            # Opción 2: Borrar todos los pedidos asociados al cliente antes de borrar el cliente.
+            """
+            cursor.execute("DELETE FROM pedidos WHERE cliente_id = %s", (cliente_id,))
+            cursor.execute("DELETE FROM clientes WHERE cliente_id = %s", (cliente_id,))
+            conn.commit()
+            flash('Cliente y sus pedidos asociados eliminados exitosamente.', 'success')
+            """
+
+        except mysql.connector.Error as err:
+            conn.rollback()
+            flash(f'Error al eliminar cliente: {err}', 'error')
+
+        finally:
+            cursor.close()
+            conn.close()
+
+        return redirect(url_for('get_clientes'))
+    else:
+        flash("No se pudo conectar a la base de datos.", 'error') # Mejor mensaje de error
+        return redirect(url_for('get_clientes')) # Asegurarse de redireccionar incluso si falla la conexión
+    
 @app.route('/metricas')
 def metricas_index():
     return render_template('metricas_index.html')
@@ -185,6 +217,23 @@ def metricas_index():
 def get_pedidos():
     pedidos = query_to_dataframe("SELECT * FROM pedidos").to_dict(orient='records')
     return render_template('pedidos.html', pedidos=pedidos)
+
+# Obtener pedido por id
+@app.route('/pedidos/<int:pedido_id>')
+def get_pedido_detalle(pedido_id):
+    conn = get_db_connection()
+    if conn:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM pedidos WHERE pedido_id = %s", (pedido_id,))
+        pedido = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        if pedido:
+            return render_template('detalle_pedido.html', pedido=pedido)  # Debes crear detalle_pedido.html
+        else:
+            return "Pedido no encontrado", 404
+    else:
+        return "No se pudo conectar a la base de datos", 500
 
 # Ruta para mostrar métricas y gráficos
 @app.route('/metricas/pedidos_por_cliente')
@@ -196,7 +245,7 @@ def pedidos_por_cliente():
     # Ejemplo de gráfico: Número de pedidos por cliente
     df_pedidos = query_to_dataframe("SELECT cliente_id, COUNT(*) as num_pedidos FROM pedidos GROUP BY cliente_id")
     # plt.figure crea una nueva figura de matplotlib con un tamaño de 8x6 pulgadas.
-    plt.figure(figsize=(8, 6))
+    plt.figure(figsize=(7, 5))
     # sns.barplot es una función de Seaborn que se utiliza para crear gráficos de barras.
     sns.barplot(x='cliente_id', y='num_pedidos', data=df_pedidos)
     plt.title('Número de Pedidos por Cliente')

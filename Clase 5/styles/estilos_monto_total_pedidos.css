@@ -1,0 +1,35 @@
+/* estilos_monto_total_pedidos.css */
+
+body {
+    font-family: sans-serif;
+    margin: 20px;
+    background-color: #f4f4f4;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #009879;
+}
+
+p {
+    font-size: 1.2em;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+a {
+    display: block;
+    margin: 20px auto; /* Centrar horizontalmente */
+    width: fit-content; /* Ajustar el ancho al contenido */
+    padding: 10px 15px;
+    background-color: #009879;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+a:hover {
+    background-color: #007a60;
+}

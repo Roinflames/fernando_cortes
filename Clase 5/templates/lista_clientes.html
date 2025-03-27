@@ -2,9 +2,8 @@
 <html>
 <head>
     <title>Lista de Clientes</title>
-    <!-- <link rel="stylesheet" href="./styles/styles.css"> -->
-    <link rel="stylesheet" href="../styles/styles.css">
-</head>
+    <link rel="stylesheet" href="../styles/estilos_generales.css">
+    <link rel="stylesheet" href="../styles/estilos_index.css"></head>
 <body>
     <h1>Lista de Clientes</h1>
     <table>
@@ -37,7 +36,7 @@
             {% endfor %}
         </tbody>
     </table>
-    <a href="/clientes/crear">Crear nuevo cliente</a>
-    <a href="/metricas">Ver métricas</a>
+    <button onclick="location.href='/clientes/crear'">Crear nuevo cliente</button>
+    <button onclick="location.href='/metricas'">Ver métricas</button>
 </body>
 </html>

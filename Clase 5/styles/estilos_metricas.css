@@ -1,0 +1,39 @@
+/* estilos_metricas.css */
+
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333; /* Un color de texto más suave */
+}
+
+ul {
+    list-style-type: none; /* Elimina los marcadores de lista */
+    padding: 0;
+    margin: 0 auto; /* Centra la lista horizontalmente */
+    width: fit-content; /* La lista se ajusta al contenido */
+}
+
+li {
+    margin-bottom: 10px;
+}
+
+li a {
+    display: block; /* Para que el enlace ocupe todo el ancho del li */
+    padding: 10px 15px;
+    background-color: #f0f0f0; /* Un fondo claro para los elementos de la lista */
+    border-radius: 4px;
+    text-decoration: none;
+    color: #007a60; /* Un color de enlace que coincide con el tema */
+    transition: background-color 0.3s ease; /* Transición suave al pasar el mouse */
+}
+
+li a:hover {
+    background-color: #e0e0e0; /* Un fondo ligeramente más oscuro al pasar el mouse */
+}
+
+a[href="/clientes"] { /* Estilo específico para el enlace "Volver" */
+    display: block;
+    margin-top: 20px;
+    text-align: center;
+    color: #009879;
+}

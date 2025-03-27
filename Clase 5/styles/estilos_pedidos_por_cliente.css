@@ -1,0 +1,48 @@
+/* estilos_metricas.css */
+
+body {
+    font-family: sans-serif;
+    margin: 20px;
+    background-color: #f4f4f4;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #009879;
+}
+
+p {
+    margin-bottom: 15px;
+    font-size: 1.1em;
+    color: #333;
+}
+
+img {
+    display: block;
+    margin: 20px auto;
+    max-width: 80%;
+    height: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.button-container {
+    text-align: center; /* Centra los botones horizontalmente */
+    margin-top: 20px; /* Espacio arriba de los botones */
+}
+
+a {
+    display: inline-block;
+    margin: 0 10px; /* Espacio a los lados de los botones */
+    padding: 10px 15px;
+    background-color: #009879;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+a:hover {
+    background-color: #007a60;
+}
