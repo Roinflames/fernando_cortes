@@ -216,6 +216,7 @@ def metricas_index():
 @app.route('/pedidos')
 def get_pedidos():
     pedidos = query_to_dataframe("SELECT * FROM pedidos").to_dict(orient='records')
+    #TODO: usos de los dataframes
     return render_template('pedidos.html', pedidos=pedidos)
 
 # Obtener pedido por id
@@ -242,9 +243,8 @@ def pedidos_por_cliente():
     # iloc es un indexador basado en enteros en Pandas, que se utiliza para seleccionar filas y columnas por su posición.
     num_clientes = query_to_dataframe("SELECT COUNT(*) as num_clientes FROM clientes").iloc[0]['num_clientes']
 
-    # Ejemplo de gráfico: Número de pedidos por cliente
     df_pedidos = query_to_dataframe("SELECT cliente_id, COUNT(*) as num_pedidos FROM pedidos GROUP BY cliente_id")
-    # plt.figure crea una nueva figura de matplotlib con un tamaño de 8x6 pulgadas.
+    # plt.figure crea una nueva figura de matplotlib con un tamaño de 7x5 pulgadas.
     plt.figure(figsize=(7, 5))
     # sns.barplot es una función de Seaborn que se utiliza para crear gráficos de barras.
     sns.barplot(x='cliente_id', y='num_pedidos', data=df_pedidos)
@@ -265,8 +265,8 @@ def pedidos_por_cliente():
 @app.route('/metricas/monto_total_pedidos')
 def monto_total_pedidos():
     # Calcular el monto total de pedidos
-    monto_total = query_to_dataframe("SELECT SUM(monto) as monto_total FROM pedidos").iloc[0]['monto_total']
-    return render_template('monto_total_pedidos.html', monto_total=monto_total)
+    monto_total_pedidos = query_to_dataframe("SELECT SUM(monto) as monto_total FROM pedidos").iloc[0]['monto_total']
+    return render_template('monto_total_pedidos.html', monto_total_pedidos=monto_total_pedidos)
 
 if __name__ == '__main__':
     app.run(debug=True)
