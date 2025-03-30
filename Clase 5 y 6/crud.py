@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import secrets
 import os
+from datetime import date
 
 # secret_key = secrets.token_hex(16)  # Genera una clave hexadecimal de 32 caracteres (16 bytes)
 # print(secret_key)
@@ -41,12 +42,31 @@ def query_to_dataframe(query):
     conn.close()
     return df
 
+def actualizar_mora():
+    conn = get_db_connection()
+    if conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE pedidos 
+            SET tipo_mora = 
+                CASE 
+                    WHEN fecha_pedido < DATE_SUB(CURDATE(), INTERVAL 1 MONTH) 
+                    THEN 'Mora Dura' 
+                    ELSE 'Mora Blanda' 
+                END
+        """)
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
 # Nueva ruta para redirigir desde la raíz a /clientes
 @app.route('/')
 def root():
     return redirect(url_for('get_clientes'))
 
-# Rutas CRUD (igual que antes)
+##### Rutas CRUD (igual que antes)
+#### CLIENTES ####
+
 # Ruta para obtener todos los clientes (READ/LIST)
 @app.route('/clientes', methods=['GET'])
 def get_clientes():
@@ -68,6 +88,7 @@ def get_clientes():
     except Exception as e:
         print(f"Ocurrió un error inesperado: {e}")
         return "Ocurrió un error inesperado.", 500
+
 # Ruta para obtener un cliente por ID (READ/DETAILS)
 @app.route('/clientes/<int:cliente_id>', methods=['GET'])
 def get_cliente(cliente_id):
@@ -163,8 +184,7 @@ def update_cliente(cliente_id):
         return "No se pudo conectar a la base de datos", 500
 
 # Ruta para eliminar un cliente (DELETE)
-from flask import flash, redirect, url_for
-import mysql.connector
+
 
 @app.route('/clientes/eliminar/<int:cliente_id>', methods=['GET'])
 def delete_cliente(cliente_id):
@@ -207,17 +227,31 @@ def delete_cliente(cliente_id):
     else:
         flash("No se pudo conectar a la base de datos.", 'error') # Mejor mensaje de error
         return redirect(url_for('get_clientes')) # Asegurarse de redireccionar incluso si falla la conexión
-    
-@app.route('/metricas')
-def metricas_index():
-    return render_template('metricas_index.html')
 
-# Obtener todos los pedidos
+#### PEDIDOS ####
+
+# Ruta para listar pedidos
 @app.route('/pedidos')
 def get_pedidos():
-    pedidos = query_to_dataframe("SELECT * FROM pedidos").to_dict(orient='records')
-    #TODO: usos de los dataframes
-    return render_template('pedidos.html', pedidos=pedidos)
+    actualizar_mora()  # Se actualiza la mora antes de mostrar los pedidos
+    conn = get_db_connection()
+    if conn:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT p.pedido_id, c.nombre, p.fecha_pedido, p.monto, p.tipo_mora FROM pedidos p JOIN clientes c ON p.cliente_id = c.cliente_id")
+        pedidos = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return render_template('lista_pedidos.html', pedidos=pedidos)
+    else:
+        flash("No se pudo conectar a la base de datos.", 'error')
+        return redirect(url_for('crear_pedido'))
+      
+# Obtener todos los pedidos
+# @app.route('/pedidos')
+# def get_pedidos():
+#     pedidos = query_to_dataframe("SELECT * FROM pedidos").to_dict(orient='records')
+#     #TODO: usos de los dataframes
+#     return render_template('pedidos.html', pedidos=pedidos)
 
 # Obtener pedido por id
 @app.route('/pedidos/<int:pedido_id>')
@@ -235,6 +269,49 @@ def get_pedido_detalle(pedido_id):
             return "Pedido no encontrado", 404
     else:
         return "No se pudo conectar a la base de datos", 500
+
+@app.route('/pedidos/crear', methods=['GET', 'POST'])
+def crear_pedido():
+    conn = get_db_connection()
+    
+    if request.method == 'POST':
+        cliente_id = request.form['cliente_id']
+        monto = request.form['monto']
+        fecha_pedido = request.form.get('fecha_pedido', str(date.today()))  # Usa la fecha actual si no se proporciona
+        
+        # Validaciones básicas
+        if not cliente_id or not monto:
+            flash('Debe seleccionar un cliente y especificar un monto.', 'error')
+            return redirect(url_for('crear_pedido'))
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO pedidos (cliente_id, fecha_pedido, monto) VALUES (%s, %s, %s)", 
+                           (cliente_id, fecha_pedido, monto))
+            conn.commit()
+            flash('Pedido creado exitosamente.', 'success')
+        except Exception as e:
+            flash(f'Error al crear el pedido: {str(e)}', 'error')
+        finally:
+            cursor.close()
+            conn.close()
+        
+        return redirect(url_for('get_pedidos'))  # Redirige a la lista de pedidos
+    
+    # Obtener lista de clientes para el formulario
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT cliente_id, nombre FROM clientes")
+    clientes = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    return render_template('crear_pedido.html', clientes=clientes)
+
+#### METRICAS ####
+
+@app.route('/metricas')
+def metricas_index():
+    return render_template('metricas_index.html')
 
 # Ruta para mostrar métricas y gráficos
 @app.route('/metricas/pedidos_por_cliente')
