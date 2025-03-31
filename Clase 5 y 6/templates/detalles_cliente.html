@@ -3,7 +3,7 @@
 <head>
     <title>Detalles del Cliente</title>
     <link rel="stylesheet" href="../styles/estilos_generales.css">
-    <link rel="stylesheet" href="../styles/estilos_detalles_cliente.css">
+    <link rel="stylesheet" href="../styles/detalles_cliente.css">
 </head>
 <body>
     <h1>Detalles del Cliente</h1>
@@ -37,8 +37,8 @@
 
     <div class="acciones">
         <button onclick="location.href='/clientes/editar/{{ cliente.cliente_id }}'">Editar</button>
-        <button onclick="location.href='/clientes/eliminar/{{ cliente.cliente_id }}'">Eliminar</button>
         <button onclick="location.href='/clientes'">Volver</button>
+        <button onclick="location.href='/clientes/eliminar/{{ cliente.cliente_id }}'">Eliminar</button>
     </div>
 </body>
 </html>

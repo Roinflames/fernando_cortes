@@ -56,3 +56,18 @@ tr:hover {
         font-weight: bold;
     }
 }
+
+a[href*="eliminar"] {
+    color: #D32F2F;
+    font-weight: bold;
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+a[href*="eliminar"]:hover {
+    background-color: #B71C1C;
+    color: white;
+    text-decoration: none;
+}

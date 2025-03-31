@@ -36,13 +36,14 @@ tr:nth-child(even) {
 }
 
 a {
-    color: #009879;
+    color: #009879; /* El verde de tu app */
     text-decoration: none;
-    transition: color 0.3s ease;
+    font-weight: bold;
+    transition: color 0.3s;
 }
 
 a:hover {
-    color: #007a60;
+    color: #007a5c; /* Un tono más oscuro para el hover */
 }
 
 /* Estilo específico para el enlace "Volver" */

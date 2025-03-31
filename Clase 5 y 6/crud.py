@@ -8,6 +8,7 @@ import seaborn as sns
 import secrets
 import os
 from datetime import date
+from babel import numbers
 
 # secret_key = secrets.token_hex(16)  # Genera una clave hexadecimal de 32 caracteres (16 bytes)
 # print(secret_key)
@@ -67,7 +68,7 @@ def root():
 ##### Rutas CRUD (igual que antes)
 #### CLIENTES ####
 
-# Ruta para obtener todos los clientes (READ/LIST)
+# CLIENTES GET ALL
 @app.route('/clientes', methods=['GET'])
 def get_clientes():
     conn = get_db_connection()
@@ -89,7 +90,7 @@ def get_clientes():
         print(f"Ocurrió un error inesperado: {e}")
         return "Ocurrió un error inesperado.", 500
 
-# Ruta para obtener un cliente por ID (READ/DETAILS)
+# CLIENTES GET BY ID
 @app.route('/clientes/<int:cliente_id>', methods=['GET'])
 def get_cliente(cliente_id):
     conn = get_db_connection()
@@ -111,7 +112,7 @@ def get_cliente(cliente_id):
 def mostrar_crear_cliente():
     return render_template('crear_cliente.html')
 
-# Ruta para crear un nuevo cliente (CREATE/ACTION)
+# CLIENTES POST
 @app.route('/clientes', methods=['POST'])
 def create_cliente():
     nombre = request.form['nombre']
@@ -157,7 +158,7 @@ def mostrar_editar_cliente(cliente_id):
     else:
         return "No se pudo conectar a la base de datos", 500
 
-# Ruta para actualizar un cliente (UPDATE/ACTION)
+# CLIENTES UPDATE
 @app.route('/clientes/<int:cliente_id>', methods=['POST'])
 def update_cliente(cliente_id):
     nombre = request.form['nombre']
@@ -183,9 +184,7 @@ def update_cliente(cliente_id):
     else:
         return "No se pudo conectar a la base de datos", 500
 
-# Ruta para eliminar un cliente (DELETE)
-
-
+# CLIENTES DELETE
 @app.route('/clientes/eliminar/<int:cliente_id>', methods=['GET'])
 def delete_cliente(cliente_id):
     # Ya no se agrega el mensaje de depuración aquí
@@ -237,10 +236,15 @@ def get_pedidos():
     conn = get_db_connection()
     if conn:
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT p.pedido_id, c.nombre, p.fecha_pedido, p.monto, p.tipo_mora FROM pedidos p JOIN clientes c ON p.cliente_id = c.cliente_id")
+        cursor.execute("SELECT p.pedido_id, COALESCE(c.nombre, 'Cliente Desconocido') AS nombre, p.fecha_pedido, p.monto, p.tipo_mora FROM pedidos p LEFT JOIN clientes c ON p.cliente_id = c.cliente_id;")
         pedidos = cursor.fetchall()
         cursor.close()
         conn.close()
+        
+        for pedido in pedidos:
+            pedido['monto'] = numbers.format_currency(pedido['monto'], 'CLP', locale='es_CL')
+            print(pedido['monto'])
+    
         return render_template('lista_pedidos.html', pedidos=pedidos)
     else:
         flash("No se pudo conectar a la base de datos.", 'error')
@@ -343,7 +347,8 @@ def pedidos_por_cliente():
 def monto_total_pedidos():
     # Calcular el monto total de pedidos
     monto_total_pedidos = query_to_dataframe("SELECT SUM(monto) as monto_total FROM pedidos").iloc[0]['monto_total']
-    return render_template('monto_total_pedidos.html', monto_total_pedidos=monto_total_pedidos)
+    monto_formateado = numbers.format_currency(monto_total_pedidos, 'CLP', locale='es_CL')
+    return render_template('monto_total_pedidos.html', monto_total_pedidos=monto_formateado)
 
 if __name__ == '__main__':
     app.run(debug=True)

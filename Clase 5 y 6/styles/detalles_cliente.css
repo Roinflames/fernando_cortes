@@ -45,3 +45,19 @@ th {
 .acciones button:hover {
     background-color: #007a60;
 }
+
+button[onclick*="eliminar"] {
+    background-color: #D32F2F;
+    color: white;
+    font-weight: bold;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.1s;
+}
+
+button[onclick*="eliminar"]:hover {
+    background-color: #B71C1C;
+    transform: scale(1.05);
+}

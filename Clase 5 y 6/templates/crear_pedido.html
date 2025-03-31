@@ -1,3 +1,10 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Crear Cliente</title>
+    <link rel="stylesheet" href="../styles/estilos_generales.css">
+    <link rel="stylesheet" href="../styles/crear_pedido.css">
+</head>
 <form action="{{ url_for('crear_pedido') }}" method="POST">
     <label for="cliente_id">Cliente:</label>
     <select name="cliente_id" required>
@@ -13,4 +20,5 @@
     <input type="date" name="fecha_pedido">
 
     <button type="submit">Crear Pedido</button>
+    <button onclick="location.href='/clientes'">Volver</button>
 </form>
