@@ -276,32 +276,49 @@ def get_pedido_detalle(pedido_id):
 @app.route('/pedidos/crear', methods=['GET', 'POST'])
 def crear_pedido():
     conn = get_db_connection()
-    
+
     if request.method == 'POST':
         cliente_id = request.form['cliente_id']
-        monto = request.form['monto']
-        fecha_pedido = request.form.get('fecha_pedido', str(date.today()))  # Usa la fecha actual si no se proporciona
-        
-        # Validaciones básicas
-        if not cliente_id or not monto:
-            flash('Debe seleccionar un cliente y especificar un monto.', 'error')
+        monto_total = float(request.form['monto'])
+        numero_cuotas = int(request.form['numero_cuotas'])
+        fecha_pedido = request.form.get('fecha_pedido', str(date.today()))
+
+        if not cliente_id or not monto_total or numero_cuotas < 1:
+            flash('Debe seleccionar un cliente, especificar un monto y al menos 1 cuota.', 'error')
             return redirect(url_for('crear_pedido'))
-        
+
         try:
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO pedidos (cliente_id, fecha_pedido, monto) VALUES (%s, %s, %s)", 
-                           (cliente_id, fecha_pedido, monto))
+            # Insertar pedido
+            cursor.execute("""
+                INSERT INTO pedidos (cliente_id, fecha_pedido, monto, numero_cuotas) 
+                VALUES (%s, %s, %s, %s)
+            """, (cliente_id, fecha_pedido, monto_total, numero_cuotas))
+            pedido_id = cursor.lastrowid
+
+            # Calcular cuotas
+            monto_cuota = round(monto_total / numero_cuotas, 2)
+            fecha_vencimiento = date.fromisoformat(fecha_pedido)
+
+            for i in range(1, numero_cuotas + 1):
+                fecha_vencimiento += timedelta(days=30)  # Una cuota cada 30 días
+                cursor.execute("""
+                    INSERT INTO cuotas (pedido_id, numero_cuota, monto_cuota, fecha_vencimiento)
+                    VALUES (%s, %s, %s, %s)
+                """, (pedido_id, i, monto_cuota, fecha_vencimiento))
+
             conn.commit()
-            flash('Pedido creado exitosamente.', 'success')
+            flash('Pedido y cuotas creados exitosamente.', 'success')
         except Exception as e:
+            conn.rollback()
             flash(f'Error al crear el pedido: {str(e)}', 'error')
         finally:
             cursor.close()
             conn.close()
-        
-        return redirect(url_for('get_pedidos'))  # Redirige a la lista de pedidos
-    
-    # Obtener lista de clientes para el formulario
+
+        return redirect(url_for('get_pedidos'))
+
+    # Obtener clientes para el formulario
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT cliente_id, nombre FROM clientes")
     clientes = cursor.fetchall()
@@ -309,7 +326,6 @@ def crear_pedido():
     conn.close()
 
     return render_template('crear_pedido.html', clientes=clientes)
-
 #### METRICAS ####
 
 @app.route('/metricas')
