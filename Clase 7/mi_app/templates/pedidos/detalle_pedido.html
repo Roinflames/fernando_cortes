@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Detalles del Pedido</title>
+    <link rel="stylesheet" href="../styles/detalle_pedido.css">
+</head>
+<body>
+    <h1>Detalles del Pedido</h1>
+    {% if pedido %}
+        <p><strong>ID del Pedido:</strong> {{ pedido.pedido_id }}</p>
+        <p><strong>ID del Cliente:</strong> {{ pedido.cliente_id }}</p>
+        <p><strong>Fecha del Pedido:</strong> {{ pedido.fecha_pedido }}</p>
+        <p><strong>Monto:</strong> {{ pedido.monto }}</p>
+    {% else %}
+        <p>Pedido no encontrado.</p>
+    {% endif %}
+    <a href="/pedidos">Volver a la lista de pedidos</a>
+</body>
+</html>

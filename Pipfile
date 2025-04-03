@@ -4,13 +4,14 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-flask = "*"
 mysql-connector-python = "*"
 pandas = "*"
 matplotlib = "*"
 seaborn = "*"
 mysql = "*"
 babel = "*"
+flask = "*"
+routes = "*"
 
 [dev-packages]
 

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Métricas</title>
+    <link rel="stylesheet" href="../styles/estilos_generales.css">
+    <link rel="stylesheet" href="../styles/pedidos_por_cliente.css">
+</head>
+<body>
+    <h1>Métricas</h1>
+    <p>Número total de clientes: {{ num_clientes }}</p>
+    <img src="data:image/png;base64,{{ plot_url }}" alt="Gráfico de pedidos por cliente">
+    <a href="/clientes">Inicio</a>
+    <a href="/metricas">Volver</a>
+</body>
+</html>

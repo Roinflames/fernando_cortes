@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Pedidos</title>
+    <link rel="stylesheet" href="../styles/estilos_generales.css">
+    <link rel="stylesheet" href="../styles/lista_pedidos.css">
+
+</head>
+<body>
+    <h1>Lista de Pedidos</h1>
+    <a href="/clientes">Inicio</a>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID Pedido</th>
+                <th>Cliente</th>
+                <th>Fecha</th>
+                <th>Monto</th>
+                <th>Tipo de Mora</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pedido in pedidos %}
+            <tr>
+                <td>{{ pedido.pedido_id }}</td>
+                <td>{{ pedido.nombre }}</td>
+                <td>{{ pedido.fecha_pedido }}</td>
+                <td>{{ pedido.monto }}</td>
+                <td>{{ pedido.tipo_mora }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+
+    <a href="{{ url_for('crear_pedido') }}">Crear Nuevo Pedido</a>
+</body>
+</html>
