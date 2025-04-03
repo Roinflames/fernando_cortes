@@ -4,7 +4,8 @@ from mi_app.database import get_db_connection  # ✅ Importa correctamente desde
 
 import pandas as pd
 
-pedidos_bp = Blueprint('pedidos', __name__, url_prefix='/pedidos')
+pedidos_bp = Blueprint('pedidos', __name__, url_prefix='/pedidos') # http://127.0.0.1:5000/pedidos/crear
+#CRUD de cualquier tabla 
 
 @pedidos_bp.route('/', methods=['GET'])
 def get_pedidos():
@@ -40,4 +41,4 @@ def crear_pedido():
     clientes = cursor.fetchall()
     cursor.close()
     conn.close()
-    return render_template('pedidos/crear_pedido.html', clientes=clientes)
+    return render_template('pedidos.crear_pedido', clientes=clientes)
